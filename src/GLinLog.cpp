@@ -84,6 +84,13 @@ static inline float lin2log(float cIn, float gain, float offset, float gamma, fl
     return cOut;
 }
 
+static inline float log2Lin(float cIn, float gain, float offset, float gamma, float whitepoint)
+{
+    float cOut = gain * (std::pow(10., (1023. * cIn - whitepoint) * 0.002 / gamma) - offset);
+
+    return cOut;
+}
+
 void GLinlogIop::pixel_engine(
     const Row& in, 
     int rowY, 
@@ -138,9 +145,9 @@ void GLinlogIop::pixel_engine(
         {
         case LOGTOLIN:
             while (rIn < END) {
-                *rOut++ = lin2log(*rIn++, _gain[0], _offset[0], _gamma[0], _whitepoint[0]);
-                *gOut++ = lin2log(*gIn++, _gain[1], _offset[1], _gamma[1], _whitepoint[1]);
-                *bOut++ = lin2log(*bIn++, _gain[2], _offset[2], _gamma[2], _whitepoint[2]);
+                *rOut++ = log2Lin(*rIn++, _gain[0], _offset[0], _gamma[0], _whitepoint[0]);
+                *gOut++ = log2Lin(*gIn++, _gain[1], _offset[1], _gamma[1], _whitepoint[1]);
+                *bOut++ = log2Lin(*bIn++, _gain[2], _offset[2], _gamma[2], _whitepoint[2]);
             }
             break;
         case LINTOLOG:
